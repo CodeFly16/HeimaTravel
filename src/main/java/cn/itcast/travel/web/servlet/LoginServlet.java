@@ -48,14 +48,15 @@ public class LoginServlet extends HttpServlet {
         if (u != null && "Y".equals(u.getStatus())) {
             //登录成功
             info.setFlag(true);
+            request.getSession().setAttribute("user",u );
         }
         //响应json数据到前端
         ObjectMapper mapper = new ObjectMapper();
+        response.setContentType("application/json;charset=utf-8");
         mapper.writeValue(response.getOutputStream(), info);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/json;charset=UTF-8");
         this.doPost(request, response);
     }
 }
