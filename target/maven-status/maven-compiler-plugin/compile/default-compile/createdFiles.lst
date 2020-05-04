@@ -4,6 +4,7 @@ cn\itcast\travel\util\JDBCUtils.class
 cn\itcast\travel\domain\Seller.class
 cn\itcast\travel\util\Md5Util.class
 cn\itcast\travel\web\servlet\CheckCodeServlet.class
+cn\itcast\travel\web\servlet\LoginServlet.class
 cn\itcast\travel\dao\UserDao.class
 cn\itcast\travel\service\UserService.class
 cn\itcast\travel\util\MailUtils.class

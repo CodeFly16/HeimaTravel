@@ -7,8 +7,6 @@ import cn.itcast.travel.service.UserService;
 import cn.itcast.travel.util.MailUtils;
 import cn.itcast.travel.util.UuidUtil;
 
-import java.util.UUID;
-
 public class UserServiceImpl implements UserService {
     private UserDao userDao = new UsedDaoImpl();
 
@@ -25,8 +23,8 @@ public class UserServiceImpl implements UserService {
         user.setCode(UuidUtil.getUuid());
         user.setStatus("N");
         //发送邮件
-        String content = "<a href='http://localhost/travel/activeUserServlet?code="+user.getCode()+"'>点击激活账号</a>";
-        MailUtils.sendMail(user.getEmail(),content ,"激活邮件");
+        String content = "<a href='http://localhost/travel/activeUserServlet?code=" + user.getCode() + "'>点击激活账号</a>";
+        MailUtils.sendMail(user.getEmail(), content, "激活邮件");
         //保存用户信息
         userDao.save(user);
         return true;
@@ -35,12 +33,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean activc(String code) {
         //根据激活码查询用户对象
-            User user = userDao.findByCode(code);
-            if (user!=null){
-                userDao.updateStatus(user);
-                return true;
-            }else {
-                return false;
-            }
+        User user = userDao.findByCode(code);
+        if (user != null) {
+            userDao.updateStatus(user);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public User login(User user) {
+        User u = null;
+        try {
+            u = userDao.findByUsernameAndPassword(user.getUsername(), user.getPassword());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return u;
     }
 }

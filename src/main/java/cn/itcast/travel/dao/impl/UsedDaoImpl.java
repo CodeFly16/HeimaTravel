@@ -3,7 +3,6 @@ package cn.itcast.travel.dao.impl;
 import cn.itcast.travel.dao.UserDao;
 import cn.itcast.travel.domain.User;
 import cn.itcast.travel.util.JDBCUtils;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -49,9 +48,27 @@ public class UsedDaoImpl implements UserDao {
         return user;
     }
 
+    /**
+     * 修改指定用户激活状态
+     *
+     * @param user
+     */
     @Override
     public void updateStatus(User user) {
         String sql = "update tab_user set status = 'Y' where uid = ?";
         template.update(sql, user.getUid());
+    }
+
+    @Override
+    public User findByUsernameAndPassword(String username, String password) {
+        User user = null;
+        try {
+            //1.定义sql
+            String sql = "select * from tab_user where username = ? and password = ?";
+            //2.执行sql
+            user = template.queryForObject(sql, new BeanPropertyRowMapper<User>(User.class), username,password);
+        } catch (Exception e) {
+        }
+        return user;
     }
 }
