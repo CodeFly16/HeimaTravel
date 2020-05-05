@@ -15,9 +15,11 @@ public class FindUserServlet extends HttpServlet {
         //从session中获取登录用户
         Object user = request.getSession().getAttribute("user");
         //将user写回客户端
+
         ObjectMapper mapper = new ObjectMapper();
         response.setContentType("application/json;charset=utf-8");
         mapper.writeValue(response.getOutputStream(),user);
+
 
     }
 

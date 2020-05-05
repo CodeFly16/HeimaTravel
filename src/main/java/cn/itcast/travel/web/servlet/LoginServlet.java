@@ -19,41 +19,50 @@ import java.util.Map;
 @WebServlet("/loginServlet")
 public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
+        //1.获取用户名和密码数据
         Map<String, String[]> map = request.getParameterMap();
+        //2.封装User对象
         User user = new User();
         try {
-            BeanUtils.populate(user, map);
+            BeanUtils.populate(user,map);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        UserService service = new UserServiceImpl();
-        //调用service层
-        User u = service.login(user);
 
-        //判断
+        //3.调用Service查询
+        UserService service = new UserServiceImpl();
+        User u  = service.login(user);
+
         ResultInfo info = new ResultInfo();
-        if (u == null) {
-            //用户名或密码错误
+
+        //4.判断用户对象是否为null
+        if(u == null){
+            //用户名密码或错误
             info.setFlag(false);
-            info.setErrorMsg("用户名或密码错误");
+            info.setErrorMsg("用户名密码或错误");
         }
-        if (u != null && "N".equals(u.getStatus())) {
-            //用户未激活
+        //5.判断用户是否激活
+        if(u != null && !"Y".equals(u.getStatus())){
+            //用户尚未激活
             info.setFlag(false);
-            info.setErrorMsg("用户尚未激活，请前往邮箱激活");
+            info.setErrorMsg("您尚未激活，请激活");
         }
-        if (u != null && "Y".equals(u.getStatus())) {
+        //6.判断登录成功
+        if(u != null && "Y".equals(u.getStatus())){
+            request.getSession().setAttribute("user",u);//登录成功标记
+
             //登录成功
             info.setFlag(true);
-            request.getSession().setAttribute("user",u );
         }
-        //响应json数据到前端
+
+        //响应数据
         ObjectMapper mapper = new ObjectMapper();
+
         response.setContentType("application/json;charset=utf-8");
-        mapper.writeValue(response.getOutputStream(), info);
+        mapper.writeValue(response.getOutputStream(),info);
+
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

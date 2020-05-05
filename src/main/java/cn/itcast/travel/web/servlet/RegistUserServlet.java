@@ -20,56 +20,66 @@ import java.util.Map;
 @WebServlet("/registUserServlet")
 public class RegistUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        //获取验证码
+
+
+        //验证校验
         String check = request.getParameter("check");
-        //从session中获取验证码
+        //从sesion中获取验证码
         HttpSession session = request.getSession();
         String checkcode_server = (String) session.getAttribute("CHECKCODE_SERVER");
-        //移除验证码
-        session.removeAttribute(checkcode_server);
-        //判断
-        if (checkcode_server==null||!checkcode_server.equalsIgnoreCase(check)){
+        session.removeAttribute("CHECKCODE_SERVER");//为了保证验证码只能使用一次
+        //比较
+        if(checkcode_server == null || !checkcode_server.equalsIgnoreCase(check)){
             //验证码错误
             ResultInfo info = new ResultInfo();
+            //注册失败
             info.setFlag(false);
-            info.setErrorMsg("验证码错误！");
+            info.setErrorMsg("验证码错误");
             //将info对象序列化为json
             ObjectMapper mapper = new ObjectMapper();
             String json = mapper.writeValueAsString(info);
-            //将json数据写回客户端
-            response.setContentType("text/json;charset=UTF-8");
+            response.setContentType("application/json;charset=utf-8");
             response.getWriter().write(json);
             return;
         }
-        //获取数据
+
+        //1.获取数据
         Map<String, String[]> map = request.getParameterMap();
+
+        //2.封装对象
         User user = new User();
         try {
-            //封装数据
-            BeanUtils.populate(user, map);
+            BeanUtils.populate(user,map);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        //调用service
+
+        //3.调用service完成注册
         UserService service = new UserServiceImpl();
         boolean flag = service.regist(user);
         ResultInfo info = new ResultInfo();
-        //响应结果
-        if (flag){
+        //4.响应结果
+        if(flag){
+            //注册成功
             info.setFlag(true);
-        }else {
+        }else{
+            //注册失败
             info.setFlag(false);
-            info.setErrorMsg("注册失败！");
+            info.setErrorMsg("注册失败!");
         }
+
         //将info对象序列化为json
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(info);
+
         //将json数据写回客户端
-        response.setContentType("text/json;charset=UTF-8");
+        //设置content-type
+        response.setContentType("application/json;charset=utf-8");
         response.getWriter().write(json);
+
+
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
